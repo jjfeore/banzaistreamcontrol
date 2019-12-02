@@ -1,0 +1,6 @@
+#Fill in and rename file to ".env"
+
+#Twitch Client Config
+TWITCH_USER=your username
+TWITCH_OAUTH=oauth token
+TWITCH_CHANNEL=chat channel
