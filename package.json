@@ -1,0 +1,26 @@
+{
+  "name": "banzaistreamcontrol",
+  "version": "1.0.0",
+  "description": "An interactive stream control for the Power USB power strip",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jjfeore/banzaistreamcontrol.git"
+  },
+  "author": "Mr. Banzai",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jjfeore/banzaistreamcontrol/issues"
+  },
+  "homepage": "https://github.com/jjfeore/banzaistreamcontrol#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "huejay": "^1.9.0",
+    "node-key-sender": "^1.0.11",
+    "play-sound": "^1.1.3",
+    "tmi.js": "^1.5.0"
+  }
+}
