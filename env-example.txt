@@ -4,3 +4,7 @@
 TWITCH_USER=your username
 TWITCH_OAUTH=oauth token
 TWITCH_CHANNEL=chat channel
+
+#Philips Hue Config
+HUE_IP=your philips hue bridge IP
+HUE_USER=your philips hue generated username
