@@ -3,14 +3,10 @@ const player = require('play-sound')(opts = {player: 'mpg123'});
 const tmi = require('tmi.js');
 const dotenv = require('dotenv');
 const huejay = require('huejay');
+const tplink = require('tplink-smarthome-api');
+const wemo = require('wemo-client');
 
 dotenv.config();
-
-// Connect to the Philips Hue bridge
-const hueClient = new huejay.Client({
-	host:     '192.168.1.2',
-	username: 'CEnnQq8TDPSVcl8SbpptgSnD4aKAdVuooPjlElEF'
-});
 
 const hueColor = {
 	deeppurple: 49316,
@@ -20,6 +16,69 @@ const hueColor = {
 	green: 25500,
 	orange: 9992
 };
+
+// Define key press values for the PowerUSB power strip
+const plug1 = ['control', 'shift', 'a'];
+const plug2 = ['control', 'shift', 'b'];
+const plug3 = ['control', 'shift', 'p'];
+
+// Connect to the Philips Hue bridge
+const hueClient = new huejay.Client({
+	host:     '192.168.1.2',
+	username: 'CEnnQq8TDPSVcl8SbpptgSnD4aKAdVuooPjlElEF'
+});
+
+// Uncomment and run the following method to get the IDs of all connected lights
+// hueClient.lights.getAll()
+//   .then(lights => {
+//     for (let light of lights) {
+//       console.log(`Light [${light.id}]: ${light.name}`);
+//     }
+//   });
+
+// Connect to the Wemo Mini Smart Plug
+const wemoClient = new wemo();
+let wemoConnection;
+
+wemoClient.load('http://192.168.1.21:49153/setup.xml', function(err, deviceInfo) {
+  console.log('Wemo PLUG FOUND: %j', deviceInfo);
+  wemoConnection = wemoClient.client(deviceInfo);
+
+  wemoConnection.on('error', function(err) {
+    console.log('WEMO PLUG ERROR: %s', err.code);
+  });
+
+  wemoConnection.on('binaryState', function(value) {
+    console.log('WEMO PLUG: Binary State changed to: %s', value);
+  });
+
+  // Turn the switch on in case it isn't already on
+  wemoConnection.setBinaryState(1);
+});
+
+
+// Connect to TP-Link Wifi Power Strip (HS300) and save the plugs
+const tplinkClient = new tplink.Client();
+let childPlugs = [];
+
+(async () => {
+	const device = await tplinkClient.getDevice({ host: '192.168.1.20' });
+  
+	console.log(device.alias);
+  
+	if (!device.children) {
+	  console.log('TP LINK PLUG: Device has no children');
+	  return;
+	} else {
+		console.log(`TP LINK PLUG: Detected device with ${device.children.length + 1} children`);
+	}
+  
+	await Promise.all(Array.from(device.children.keys(), async (childId) => {
+	  let childPlug = await tplinkClient.getDevice({ host: '192.168.1.20', childId });
+	  childPlugs.push(childPlug);
+	  console.log(`TP LINK PLUG: Plug with ID ${childId} ready`)
+	}));
+})();
 
 // Connect to Twitch chat
 const tmiClient = new tmi.Client({
@@ -36,41 +95,6 @@ const tmiClient = new tmi.Client({
 });
 
 tmiClient.connect();
-
-// Blue light
-const plug1 = ['control', 'shift', 'a'];
-// Red light
-const plug2 = ['control', 'shift', 'b'];
-// Disco light
-const plug3 = ['control', 'shift', 'p'];
-
-// Chat message or whisper
-tmiClient.on("message", (channel, userstate, message, self) => {
-    if (self) return;
-
-	let msgType = userstate['message-type'];
-	let isMod = userstate['user-type'] == 'mod';
-
-	if (msgType == 'chat' && isMod) {
-		console.log(message);
-		ks.sendCombination(plug1);
-		setTimeout(function(){ ks.sendCombination(plug1); }, 8000);
-		
-		player.play('toilet.mp3', function(err){
-			if (err) throw err
-		});
-	}
-});
-
-// User has been banned
-tmiClient.on("ban", (channel, username, reason, userstate) => {
-    // Do your stuff.
-});
-
-// User has been timed out
-tmiClient.on("timeout", (channel, username, reason, duration, userstate) => {
-    // Do your stuff.
-});
 
 // Pulse the specified light for 15 seconds, then turn it off
 function strobeLight(lightID, color) {
@@ -117,11 +141,32 @@ function stopLight(lightID) {
 		});
 }
 
+// Chat message or whisper
+tmiClient.on("message", (channel, userstate, message, self) => {
+    if (self) return;
 
-// Uncomment and run the following method to get the IDs of all connected lights
-// hueClient.lights.getAll()
-//   .then(lights => {
-//     for (let light of lights) {
-//       console.log(`Light [${light.id}]: ${light.name}`);
-//     }
-//   });
+	let msgType = userstate['message-type'];
+	let isMod = userstate['user-type'] == 'mod';
+
+	if (msgType == 'chat' && isMod) {
+		console.log(message);
+		// wemoConnection.setBinaryState(1);
+		childPlugs[0].setPowerState(0).then((powerState, err) => {
+			console.log(`Child plug set to power state ${powerState}`);
+		});
+		
+		player.play('toilet.mp3', function(err){
+			if (err) throw err
+		});
+	}
+});
+
+// User has been banned
+tmiClient.on("ban", (channel, username, reason, userstate) => {
+    // Do your stuff.
+});
+
+// User has been timed out
+tmiClient.on("timeout", (channel, username, reason, duration, userstate) => {
+    // Do your stuff.
+});
