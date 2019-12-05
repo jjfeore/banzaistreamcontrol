@@ -97,7 +97,7 @@ const tmiClient = new tmi.Client({
 tmiClient.connect();
 
 // Pulse the specified light for 15 seconds, then turn it off
-function strobeLight(lightID, color) {
+function strobeLight(lightID, color, timeout, stop = true) {
 	hueClient.lights.getById(lightID)
 		.then(light => {
 			console.log('Hue: ' + light.hue);
@@ -110,7 +110,17 @@ function strobeLight(lightID, color) {
 			return hueClient.lights.save(light);
 		})
 		.then(light => {
-			setTimeout(function() {stopLight(lightID);}, 15000);
+			// If the timeout is over 15000, then renew the strobing at 15 sec intervals
+			if (timeout >= 16000) {
+				let intervals = 1;
+				for (let timeRemaining = timeout - 15000; timeRemaining >= 1000; timeRemaining -= 15000) {
+					let nextTimeout = timeRemaining > 15000 ? 15000 : timeRemaining;
+					setTimeout(function() {strobeLight(lightID, color, nextTimeout, false);}, 15000 * intervals);
+					intervals++;
+				}
+			}
+			if (stop)
+				setTimeout(function() {stopLight(lightID);}, timeout);
 		})
 		.catch(error => {
 			console.log('HUE LIGHT: Error modifying light state');
@@ -119,11 +129,11 @@ function strobeLight(lightID, color) {
 }
 
 // Pulses two lights in an alternating pattern
-// Ex. alternateStrobing(3, 8, hueColor.red, hueColor.blue);
-function alternateStrobing(light1, light2, color1, color2) {
+// Ex. alternateStrobing(3, 8, hueColor.red, hueColor.blue, 15000);
+function alternateStrobing(light1, light2, color1, color2, timeout) {
 	console.log('HUE LIGHT: Alternate strobing');
-	strobeLight(light1, color1);
-	setTimeout(function() {strobeLight(light2, color2);}, 500);
+	strobeLight(light1, color1, timeout);
+	setTimeout(function() {strobeLight(light2, color2, timeout);}, 500);
 }
 
 // Turn off the specified light
@@ -170,3 +180,16 @@ tmiClient.on("ban", (channel, username, reason, userstate) => {
 tmiClient.on("timeout", (channel, username, reason, duration, userstate) => {
     // Do your stuff.
 });
+
+// Sub bomb triggered
+tmiClient.on("submysterygift", (channel, username, numbOfSubs, methods, userstate) => {
+    if (numbOfSubs >= 5) {
+		player.play('./sounds/boom.mp3', function(err){
+			if (err) throw err
+		});
+		
+		alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 26000);
+	}
+});
+
+alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 35000);
