@@ -51,9 +51,6 @@ wemoClient.load('http://192.168.1.21:49153/setup.xml', function(err, deviceInfo)
   wemoConnection.on('binaryState', function(value) {
     console.log('WEMO PLUG: Binary State changed to: %s', value);
   });
-
-  // Turn the switch on in case it isn't already on
-  wemoConnection.setBinaryState(1);
 });
 
 
@@ -70,7 +67,7 @@ let childPlugs = [null, null, null, null, null, null];
 	  console.log('TP LINK PLUG: Device has no children');
 	  return;
 	} else {
-		console.log(`TP LINK PLUG: Detected device with ${device.children.length + 1} children`);
+		console.log(`TP LINK PLUG: Detected device with ${device.children.keys().length} children`);
 	}
   
 	await Promise.all(Array.from(device.children.keys(), async (childId) => {
@@ -158,7 +155,6 @@ function stopLight(lightID) {
 // tpPlugs: An array of the plug indices for the TP Link power strip
 // timeout: The duration to wait before toggling the switches back
 function changePowerSwitches(wemoState, tpState, tpPlugs, timeout) {
-	console.log()
 	wemoConnection.setBinaryState(wemoState);
 	for (let plug of tpPlugs) {
 		childPlugs[plug].setPowerState(tpState).then((powerState, err) => {
@@ -167,7 +163,6 @@ function changePowerSwitches(wemoState, tpState, tpPlugs, timeout) {
 	}
 
 	// If a timeout is given, toggle the switches back after the timeout expires
-	// wemoState should always be toggled back to 1
 	if (timeout > 0) {
 		setTimeout(function() {
 			changePowerSwitches(1, tpState ? 0 : 1, tpPlugs, 0);
@@ -176,10 +171,10 @@ function changePowerSwitches(wemoState, tpState, tpPlugs, timeout) {
 }
 
 let welcomedUsers = new Set();
+let isPaused = false;
 
 // Chat message or whisper
-tmiClient.on("message", (channel, userstate, message, self) => {
-	let msgType = userstate['message-type'];
+tmiClient.on("chat", (channel, userstate, message, self) => {
 	let isMod = userstate['mod'] ? userstate['mod'] : false;
 	let isSub = userstate['subscriber'] ? userstate['subscriber'] : false;
 	let isVip = userstate['badges-raw'] ? userstate['badges-raw'].includes('vip') : false;
@@ -188,9 +183,22 @@ tmiClient.on("message", (channel, userstate, message, self) => {
 	let emotes = userstate['emotes'] ? Object.keys(userstate['emotes']) : [];
 	let emoteSet = new Set(emotes);
 
+	message = message.toLowerCase();
 	// console.log(`User is ${userstate['username']} with emotes ${emotes}`);
 
-	if (msgType == 'chat' && isMod && message.startsWith("!demo")) {
+	// Allow mods to toggle safemode on or off
+	if (isMod && message.startsWith("!safemode")) {
+		let words = message.split(' ');
+		if (words[1] == 'on') {
+			isPaused = true;
+		}
+		else if (words[1] == 'off') {
+			isPaused = false;
+		}
+	}
+
+	// Allow mods to trigger a demo
+	if (isMod && message.startsWith("!demo") && !isPaused) {
 		changePowerSwitches(0, 1, [0, 1, 2, 3, 4, 5], 10000);
 		
 		alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 10000);
@@ -202,7 +210,7 @@ tmiClient.on("message", (channel, userstate, message, self) => {
 	}
 
 	// If a Mod/Sub/VIP says HeyGuys for the first time that day
-	if (msgType == 'chat' && (isMod || isSub || isVip) && emoteSet.has('30259') && !welcomedUsers.has(userstate['username'])) {
+	if ((isMod || isSub || isVip) && !isPaused && emoteSet.has('30259') && !welcomedUsers.has(userstate['username'])) {
 		changePowerSwitches(1, 1, [2, 3, 4], 2000);
 		
 		alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 2000);
@@ -217,18 +225,20 @@ tmiClient.on("message", (channel, userstate, message, self) => {
 
 // User has been banned
 tmiClient.on("ban", (channel, username, reason, userstate) => {
-	player.play('./sounds/soundofdapolice.mp3', function(err){
-		if (err) throw err
-	});
-	
-	alternateStrobing(3, 8, hueColor.red, hueColor.blue, 8000);
-	alternateStrobing(9, 10, hueColor.red, hueColor.blue, 8000);
-	changePowerSwitches(0, 1, [0, 1], 8000);
+	if (!isPaused) {
+		player.play('./sounds/soundofdapolice.mp3', function(err){
+			if (err) throw err
+		});
+		
+		alternateStrobing(3, 8, hueColor.red, hueColor.blue, 8000);
+		alternateStrobing(9, 10, hueColor.red, hueColor.blue, 8000);
+		changePowerSwitches(0, 1, [0, 1], 8000);
+	}
 });
 
 // User has been timed out
 tmiClient.on("timeout", (channel, username, reason, duration, userstate) => {
-    if (duration >= 300) {
+    if (duration >= 300 && !isPaused) {
 		player.play('./sounds/soundofdapolice.mp3', function(err){
 			if (err) throw err
 		});
@@ -241,7 +251,7 @@ tmiClient.on("timeout", (channel, username, reason, duration, userstate) => {
 
 // Channel has been raided
 tmiClient.on("raided", (channel, username, viewers) => {
-	if (viewers >= 5) {
+	if (viewers >= 5 && !isPaused) {
 		player.play('./sounds/redalert.mp3', function(err){
 			if (err) throw err
 		});
@@ -254,7 +264,7 @@ tmiClient.on("raided", (channel, username, viewers) => {
 
 // Sub bomb triggered
 tmiClient.on("submysterygift", (channel, username, numbOfSubs, methods, userstate) => {
-    if (numbOfSubs >= 5) {
+    if (numbOfSubs >= 5 && !isPaused) {
 		player.play('./sounds/boom.mp3', function(err){
 			if (err) throw err
 		});
