@@ -190,9 +190,11 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 	if (isMod && message.startsWith("!safemode")) {
 		let words = message.split(' ');
 		if (words[1] == 'on') {
+			console.log('SAFE MODE ON');
 			isPaused = true;
 		}
 		else if (words[1] == 'off') {
+			console.log('SAFE MODE OFF');
 			isPaused = false;
 		}
 	}
