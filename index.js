@@ -41,7 +41,7 @@ const wemoClient = new wemo();
 let wemoConnection;
 
 wemoClient.load('http://192.168.1.21:49153/setup.xml', function(err, deviceInfo) {
-  console.log('Wemo PLUG FOUND: %j', deviceInfo);
+  console.log('Wemo PLUG FOUND');
   wemoConnection = wemoClient.client(deviceInfo);
 
   wemoConnection.on('error', function(err) {
@@ -60,8 +60,6 @@ let childPlugs = [null, null, null, null, null, null];
 
 (async () => {
 	const device = await tplinkClient.getDevice({ host: '192.168.1.20' });
-  
-	console.log(device.alias);
   
 	if (!device.children) {
 	  console.log('TP LINK PLUG: Device has no children');
@@ -155,7 +153,9 @@ function stopLight(lightID) {
 // tpPlugs: An array of the plug indices for the TP Link power strip
 // timeout: The duration to wait before toggling the switches back
 function changePowerSwitches(wemoState, tpState, tpPlugs, timeout) {
-	wemoConnection.setBinaryState(wemoState);
+	if (!wemoState) {
+		wemoConnection.setBinaryState(wemoState);
+	}
 	for (let plug of tpPlugs) {
 		childPlugs[plug].setPowerState(tpState).then((powerState, err) => {
 			console.log(`Child plug set to power state ${powerState}`);
@@ -165,17 +165,27 @@ function changePowerSwitches(wemoState, tpState, tpPlugs, timeout) {
 	// If a timeout is given, toggle the switches back after the timeout expires
 	if (timeout > 0) {
 		setTimeout(function() {
-			changePowerSwitches(1, tpState ? 0 : 1, tpPlugs, 0);
+			// changePowerSwitches(1, tpState ? 0 : 1, tpPlugs, 0);
+			if (!wemoState) {
+				wemoConnection.setBinaryState(1);
+			}
+			flipState = tpState ? 0 : 1;
+			for (let plug of tpPlugs) {
+				childPlugs[plug].setPowerState(flipState).then((powerState, err) => {
+					console.log(`Child plug set to power state ${powerState}`);
+				});
+			}
 		}, timeout);
 	}
 }
 
 let welcomedUsers = new Set();
+let noticedUsers = new Set();
 let isPaused = false;
 
 // Chat message or whisper
 tmiClient.on("chat", (channel, userstate, message, self) => {
-	let isMod = userstate['mod'] ? userstate['mod'] : false;
+	let isMod = (userstate['mod'] || userstate['username'] == 'banzaibaby') ? true : false;
 	let isSub = userstate['subscriber'] ? userstate['subscriber'] : false;
 	let isVip = userstate['badges-raw'] ? userstate['badges-raw'].includes('vip') : false;
 
@@ -184,7 +194,7 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 	let emoteSet = new Set(emotes);
 
 	message = message.toLowerCase();
-	// console.log(`User is ${userstate['username']} with emotes ${emotes}`);
+	console.log(`User is ${userstate['username']} with type ${userstate['user-type']} and isMod ${isMod}`);
 
 	// Allow mods to toggle safemode on or off
 	if (isMod && message.startsWith("!safemode")) {
@@ -211,17 +221,30 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 		});
 	}
 
-	// If a Mod/Sub/VIP says HeyGuys for the first time that day
-	if ((isMod || isSub || isVip) && !isPaused && emoteSet.has('30259') && !welcomedUsers.has(userstate['username'])) {
-		changePowerSwitches(1, 1, [2, 3, 4], 2000);
+	// If a Mod/Sub/VIP says HeyGuys for the first time that day or anyone uses bzbHey
+	if ((((isMod || isSub || isVip) && emoteSet.has('30259')) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !isPaused && !welcomedUsers.has(userstate['username'])) {
+		changePowerSwitches(1, 1, [2, 3, 4], 3000);
 		
-		alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 2000);
-		alternateStrobing(9, 10, hueColor.deeppurple, hueColor.orange, 2000);
+		alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 3000);
+		alternateStrobing(9, 10, hueColor.deeppurple, hueColor.orange, 3000);
 		
 		player.play('./sounds/hello.mp3', function(err){
 			if (err) throw err
 		});
 		welcomedUsers.add(userstate['username']);
+	}
+
+	// If someone uses bzbNoticeMe
+	if (emoteSet.has('emotesv2_461c6588d71e43c6b95dea6052d15701') && !isPaused && !noticedUsers.has(userstate['username'])) {
+		changePowerSwitches(1, 1, [2, 3, 4, 5], 6000);
+		
+		alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 6000);
+		alternateStrobing(9, 10, hueColor.deeppurple, hueColor.orange, 6000);
+		
+		player.play('./sounds/noticemesenpai.mp3', function(err){
+			if (err) throw err
+		});
+		noticedUsers.add(userstate['username']);
 	}
 });
 
