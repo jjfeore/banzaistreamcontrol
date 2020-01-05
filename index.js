@@ -1,10 +1,10 @@
-const ks = require('node-key-sender');
 const player = require('play-sound')(opts = {player: 'mpg123'});
 const tmi = require('tmi.js');
 const dotenv = require('dotenv');
 const huejay = require('huejay');
 const tplink = require('tplink-smarthome-api');
 const wemo = require('wemo-client');
+const WebSocket = require('ws');
 
 dotenv.config();
 
@@ -17,10 +17,79 @@ const hueColor = {
 	orange: 9992
 };
 
-// Define key press values for the PowerUSB power strip
-const plug1 = ['control', 'shift', 'a'];
-const plug2 = ['control', 'shift', 'b'];
-const plug3 = ['control', 'shift', 'p'];
+let ws;
+
+// Source: https://www.thepolyglotdeveloper.com/2015/03/create-a-random-nonce-string-using-javascript/
+function nonce(length) {
+    let text = "";
+    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (let i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
+function wsHeartbeat() {
+    message = {
+        type: 'PING'
+    };
+    console.log('WebSocket PING Sent');
+    ws.send(JSON.stringify(message));
+}
+
+function wsListen(topic) {
+    message = {
+        type: 'LISTEN',
+        nonce: nonce(15),
+        data: {
+            topics: [topic],
+            auth_token: process.env.TWITCH_APP_OAUTH
+        }
+	};
+	let stringified = JSON.stringify(message);
+    console.log('Websocket Sent: ' + stringified);
+    ws.send(stringified);
+}
+
+function wsConnect() {
+    let heartbeatInterval = 60000;
+    let reconnectInterval = 3000;
+    let heartbeatHandle;
+
+    ws = new WebSocket('wss://pubsub-edge.twitch.tv');
+
+    ws.on('open', function() {
+        console.log('WebSocket Opened');
+        wsHeartbeat();
+		heartbeatHandle = setInterval(wsHeartbeat, heartbeatInterval);
+		wsListen(`channel-points-channel-v1.${process.env.TWITCH_CHANNEL_ID}`);
+    });
+
+    ws.on('error', function(error) {
+        console.log('Websocket Error: ' + error);
+    });
+
+    ws.on('message', function(data) {
+        message = JSON.parse(data);
+        console.log('WebSocket Received: ' + data);
+        if (message.type == 'RECONNECT') {
+            console.log('WebSocket Reconnecting...');
+            setTimeout(connect, reconnectInterval);
+		}
+		else if (message.type == 'reward-redeemed') {
+			redeemReward(message.data);
+		}
+    });
+
+    ws.on('close', function(code, reason) {
+        console.log('WebSocket Closed: ' + reason);
+        clearInterval(heartbeatHandle);
+        console.log('WebSocket Reconnecting...');
+        setTimeout(connect, reconnectInterval);
+    });
+}
+
+wsConnect();
 
 // Connect to the Philips Hue bridge
 const hueClient = new huejay.Client({
@@ -194,7 +263,7 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 	let emoteSet = new Set(emotes);
 
 	message = message.toLowerCase();
-	console.log(`User is ${userstate['username']} with type ${userstate['user-type']} and isMod ${isMod}`);
+	// console.log(`User is ${userstate['username']} with type ${userstate['user-type']} and isMod ${isMod}`);
 
 	// Allow mods to toggle safemode on or off
 	if (isMod && message.startsWith("!safemode")) {
@@ -299,3 +368,7 @@ tmiClient.on("submysterygift", (channel, username, numbOfSubs, methods, userstat
 		changePowerSwitches(0, 1, [0, 1, 2, 3, 4, 5], 26000);
 	}
 });
+
+function redeemReward(data) {
+
+}
