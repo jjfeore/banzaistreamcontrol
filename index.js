@@ -76,8 +76,11 @@ function wsConnect() {
             console.log('WebSocket Reconnecting...');
             setTimeout(connect, reconnectInterval);
 		}
-		else if (message.type == 'reward-redeemed') {
-			redeemReward(message.data);
+		else if (message.type == 'MESSAGE' && message.data && message.data.message) {
+			let messageParsed = JSON.parse(message.data.message);
+			if (messageParsed.type && messageParsed.data && messageParsed.type == 'reward-redeemed') {
+				redeemReward(messageParsed.data);
+			}
 		}
     });
 
