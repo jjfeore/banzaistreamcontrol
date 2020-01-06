@@ -419,10 +419,12 @@ tmiClient.on("submysterygift", (channel, username, numbOfSubs, methods, userstat
 });
 
 function redeemReward(data) {
-	if(data && data.reward && data.reward.title && data.reward.title == 'Tube Man' && !isPaused) {
-		triggerLightAndNoise("tubeman");
-	}
-	else if(data && data.reward && data.reward.title && data.reward.title == 'Boogie' && !isPaused) {
-		triggerLightAndNoise("boogie");
+	if (data && data.redemption && data.redemption.reward && data.redemption.reward.title) {
+		if(data.redemption.reward.title == 'Tube Man' && !isPaused) {
+			triggerLightAndNoise("tubeman");
+		}
+		else if(data.redemption.reward.title == 'Boogie' && !isPaused) {
+			triggerLightAndNoise("boogie");
+		}
 	}
 }
