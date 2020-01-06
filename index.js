@@ -248,6 +248,97 @@ function changePowerSwitches(wemoState, tpState, tpPlugs, timeout) {
 	}
 }
 
+let alerts = {
+	demo: {
+		timeout: 10000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 0,
+		tpState: 1,
+		tpPlugs: [0, 1, 2, 3, 4, 5],
+		sound: './sounds/soundofdapolice.mp3'
+	},
+	hello: {
+		timeout: 3000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello.mp3'
+	},
+	senpai: {
+		timeout: 6000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4, 5],
+		sound: './sounds/noticemesenpai.mp3'
+	},
+	ban: {
+		timeout: 8000,
+		strobe1: hueColor.blue,
+		strobe2: hueColor.red,
+		wemoState: 0,
+		tpState: 1,
+		tpPlugs: [0, 1],
+		sound: './sounds/soundofdapolice.mp3'
+	},
+	raid: {
+		timeout: 21000,
+		strobe1: hueColor.red,
+		strobe2: hueColor.orange,
+		wemoState: 0,
+		tpState: 1,
+		tpPlugs: [0, 2],
+		sound: './sounds/redalert.mp3'
+	},
+	subbomb: {
+		timeout: 26000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 0,
+		tpState: 1,
+		tpPlugs: [0, 1, 2, 3, 4, 5],
+		sound: './sounds/boom.mp3'
+	},
+	tubeman: {
+		timeout: 7000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.blue,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [4, 5],
+		sound: './sounds/tubeman.mp3'
+	},
+	boogie: {
+		timeout: 15000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [0, 1, 2, 3, 4, 5],
+		sound: './sounds/boogie.mp3'
+	}
+}
+
+function triggerLightAndNoise(type) {
+	let alert = alerts[type];
+	changePowerSwitches(alert.wemoState, alert.tpState, alert.tpPlugs, alert.timeout);
+	
+	if (alert.strobe1 && alert.strobe2) {
+		alternateStrobing(3, 8, alert.strobe1, alert.strobe2, alert.timeout);
+		alternateStrobing(9, 10, alert.strobe1, alert.strobe2, alert.timeout);
+	}
+	
+	if (alert.sound) {
+		player.play(alert.sound, function(err){
+			if (err) throw err
+		});
+	}
+}
+
 let welcomedUsers = new Set();
 let noticedUsers = new Set();
 let isPaused = false;
@@ -280,39 +371,18 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 
 	// Allow mods to trigger a demo
 	if (isMod && message.startsWith("!demo") && !isPaused) {
-		changePowerSwitches(0, 1, [0, 1, 2, 3, 4, 5], 10000);
-		
-		alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 10000);
-		alternateStrobing(9, 10, hueColor.deeppurple, hueColor.orange, 10000);
-		
-		player.play('./sounds/soundofdapolice.mp3', function(err){
-			if (err) throw err
-		});
+		triggerLightAndNoise("demo");
 	}
 
 	// If a Mod/Sub/VIP says HeyGuys for the first time that day or anyone uses bzbHey
 	if ((((isMod || isSub || isVip) && emoteSet.has('30259')) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !isPaused && !welcomedUsers.has(userstate['username'])) {
-		changePowerSwitches(1, 1, [2, 3, 4], 3000);
-		
-		alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 3000);
-		alternateStrobing(9, 10, hueColor.deeppurple, hueColor.orange, 3000);
-		
-		player.play('./sounds/hello.mp3', function(err){
-			if (err) throw err
-		});
+		triggerLightAndNoise("hello");
 		welcomedUsers.add(userstate['username']);
 	}
 
 	// If someone uses bzbNoticeMe
 	if (emoteSet.has('emotesv2_461c6588d71e43c6b95dea6052d15701') && !isPaused && !noticedUsers.has(userstate['username'])) {
-		changePowerSwitches(1, 1, [2, 3, 4, 5], 6000);
-		
-		alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 6000);
-		alternateStrobing(9, 10, hueColor.deeppurple, hueColor.orange, 6000);
-		
-		player.play('./sounds/noticemesenpai.mp3', function(err){
-			if (err) throw err
-		});
+		triggerLightAndNoise("senpai");
 		noticedUsers.add(userstate['username']);
 	}
 });
@@ -320,55 +390,36 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 // User has been banned
 tmiClient.on("ban", (channel, username, reason, userstate) => {
 	if (!isPaused) {
-		player.play('./sounds/soundofdapolice.mp3', function(err){
-			if (err) throw err
-		});
-		
-		alternateStrobing(3, 8, hueColor.red, hueColor.blue, 8000);
-		alternateStrobing(9, 10, hueColor.red, hueColor.blue, 8000);
-		changePowerSwitches(0, 1, [0, 1], 8000);
+		triggerLightAndNoise("ban");
 	}
 });
 
 // User has been timed out
 tmiClient.on("timeout", (channel, username, reason, duration, userstate) => {
     if (duration >= 300 && !isPaused) {
-		player.play('./sounds/soundofdapolice.mp3', function(err){
-			if (err) throw err
-		});
-		
-		alternateStrobing(3, 8, hueColor.red, hueColor.blue, 8000);
-		alternateStrobing(9, 10, hueColor.red, hueColor.blue, 8000);
-		changePowerSwitches(0, 1, [0, 1], 8000);
+		triggerLightAndNoise("ban");
 	}
 });
 
 // Channel has been raided
 tmiClient.on("raided", (channel, username, viewers) => {
 	if (viewers >= 5 && !isPaused) {
-		player.play('./sounds/redalert.mp3', function(err){
-			if (err) throw err
-		});
-		
-		alternateStrobing(3, 8, hueColor.red, hueColor.orange, 21000);
-		alternateStrobing(9, 10, hueColor.red, hueColor.orange, 21000);
-		changePowerSwitches(0, 1, [0, 2], 21000);
+		triggerLightAndNoise("raid");
 	}
 });
 
 // Sub bomb triggered
 tmiClient.on("submysterygift", (channel, username, numbOfSubs, methods, userstate) => {
     if (numbOfSubs >= 5 && !isPaused) {
-		player.play('./sounds/boom.mp3', function(err){
-			if (err) throw err
-		});
-		
-		alternateStrobing(3, 8, hueColor.deeppurple, hueColor.orange, 26000);
-		alternateStrobing(9, 10, hueColor.deeppurple, hueColor.orange, 26000);
-		changePowerSwitches(0, 1, [0, 1, 2, 3, 4, 5], 26000);
+		triggerLightAndNoise("subbomb");
 	}
 });
 
 function redeemReward(data) {
-
+	if(data && data.reward && data.reward.title && data.reward.title == 'Tube Man' && !isPaused) {
+		triggerLightAndNoise("tubeman");
+	}
+	else if(data && data.reward && data.reward.title && data.reward.title == 'Boogie' && !isPaused) {
+		triggerLightAndNoise("boogie");
+	}
 }
