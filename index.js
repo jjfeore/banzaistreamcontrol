@@ -319,7 +319,7 @@ let alerts = {
 		timeout: 15000,
 		strobe1: hueColor.deeppurple,
 		strobe2: hueColor.orange,
-		wemoState: 1,
+		wemoState: 0,
 		tpState: 1,
 		tpPlugs: [0, 1, 2, 3, 4, 5],
 		sound: './sounds/boogie.mp3'
