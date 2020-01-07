@@ -357,7 +357,7 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 	let emoteSet = new Set(emotes);
 
 	message = message.toLowerCase();
-	// console.log(`User is ${userstate['username']} with type ${userstate['user-type']} and isMod ${isMod}`);
+	// console.log(`User is ${userstate['username']} with type ${userstate['user-type']} and emotes is ${emotes}`);
 
 	// Allow mods to toggle safemode on or off
 	if (isMod && message.startsWith("!safemode")) {
@@ -378,7 +378,7 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 	}
 
 	// If a Mod/Sub/VIP says HeyGuys for the first time that day or anyone uses bzbHey
-	if ((((isMod || isSub || isVip) && emoteSet.has('30259')) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !isPaused && !welcomedUsers.has(userstate['username'])) {
+	if ((((isMod || isSub || isVip) && (emoteSet.has('30259') || emoteSet.has('160400'))) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !isPaused && !welcomedUsers.has(userstate['username'])) {
 		triggerLightAndNoise("hello");
 		welcomedUsers.add(userstate['username']);
 	}
