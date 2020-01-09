@@ -377,6 +377,14 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 		triggerLightAndNoise("demo");
 	}
 
+	// Allow mods to trigger any sound/light combo
+	if (isMod && message.startsWith("!trigger") && !isPaused) {
+		let words = message.split(' ');
+		if (words[1] in alerts) {
+			triggerLightAndNoise(words[1]);
+		}
+	}
+
 	// If a Mod/Sub/VIP says HeyGuys for the first time that day or anyone uses bzbHey
 	if ((((isMod || isSub || isVip) && (emoteSet.has('30259') || emoteSet.has('160400'))) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !isPaused && !welcomedUsers.has(userstate['username'])) {
 		triggerLightAndNoise("hello");
