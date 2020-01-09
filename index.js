@@ -5,6 +5,7 @@ const huejay = require('huejay');
 const tplink = require('tplink-smarthome-api');
 const wemo = require('wemo-client');
 const WebSocket = require('ws');
+const OBSWebSocket = require('obs-websocket-js');
 
 dotenv.config();
 
@@ -17,7 +18,16 @@ const hueColor = {
 	orange: 9992
 };
 
-let ws;
+// Configure OBS websocket
+const obs = new OBSWebSocket();
+obs.connect({
+    address: 'localhost:4444',
+    password: process.env.OBS_WS_PASS
+}).then(() => {
+    console.log(`Connected to OBS via Websocket`);
+}).catch(err => {
+    console.log('Error on OBS Websocket connect: ' + err);
+});
 
 // Source: https://www.thepolyglotdeveloper.com/2015/03/create-a-random-nonce-string-using-javascript/
 function nonce(length) {
@@ -28,6 +38,9 @@ function nonce(length) {
     }
     return text;
 }
+
+// Configure WebSocket for Twitch PubSub
+let ws;
 
 function wsHeartbeat() {
     message = {
