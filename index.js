@@ -326,25 +326,37 @@ let alerts = {
 	}
 }
 
+let isPaused = false;
+let isExecuting = false;
+let eventQueue = [];
+
 function triggerLightAndNoise(type) {
-	let alert = alerts[type];
-	changePowerSwitches(alert.wemoState, alert.tpState, alert.tpPlugs, alert.timeout);
-	
-	if (alert.strobe1 && alert.strobe2) {
-		alternateStrobing(3, 8, alert.strobe1, alert.strobe2, alert.timeout);
-		alternateStrobing(9, 10, alert.strobe1, alert.strobe2, alert.timeout);
-	}
-	
-	if (alert.sound) {
-		player.play(alert.sound, function(err){
-			if (err) throw err
-		});
+	if (isPaused || isExecuting) {
+		eventQueue.push(type);
+	} else if (type) {
+		isExecuting = true;
+		let alert = alerts[type];
+		changePowerSwitches(alert.wemoState, alert.tpState, alert.tpPlugs, alert.timeout);
+		
+		if (alert.strobe1 && alert.strobe2) {
+			alternateStrobing(3, 8, alert.strobe1, alert.strobe2, alert.timeout);
+			alternateStrobing(9, 10, alert.strobe1, alert.strobe2, alert.timeout);
+		}
+		
+		if (alert.sound) {
+			player.play(alert.sound, function(err){
+				if (err) throw err
+			});
+		}
+		setTimeout(function() {
+			isExecuting = false;
+			triggerLightAndNoise(eventQueue.shift());
+		}, alert.timeout + 3000);
 	}
 }
 
 let welcomedUsers = new Set();
 let noticedUsers = new Set();
-let isPaused = false;
 
 // Chat message or whisper
 tmiClient.on("chat", (channel, userstate, message, self) => {
@@ -362,23 +374,29 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 	// Allow mods to toggle safemode on or off
 	if (isMod && message.startsWith("!safemode")) {
 		let words = message.split(' ');
-		if (words[1] == 'on') {
+		if (words.length == 1) {
+			tmiClient.say(process.env.TWITCH_CHANNEL, `Safe Mode is currently ${isPaused ? 'ON' : 'OFF'}`);
+		}
+		else if (words[1] == 'on') {
 			console.log('SAFE MODE ON');
 			isPaused = true;
+			tmiClient.say(process.env.TWITCH_CHANNEL, "Safe Mode changed to ON");
 		}
 		else if (words[1] == 'off') {
 			console.log('SAFE MODE OFF');
 			isPaused = false;
+			tmiClient.say(process.env.TWITCH_CHANNEL, "Safe Mode changed to OFF");
+			triggerLightAndNoise(eventQueue.shift());
 		}
 	}
 
 	// Allow mods to trigger a demo
-	if (isMod && message.startsWith("!demo") && !isPaused) {
+	if (isMod && message.startsWith("!demo")) {
 		triggerLightAndNoise("demo");
 	}
 
 	// Allow mods to trigger any sound/light combo
-	if (isMod && message.startsWith("!trigger") && !isPaused) {
+	if (isMod && message.startsWith("!trigger")) {
 		let words = message.split(' ');
 		if (words[1] in alerts) {
 			triggerLightAndNoise(words[1]);
@@ -386,13 +404,13 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 	}
 
 	// If a Mod/Sub/VIP says HeyGuys for the first time that day or anyone uses bzbHey
-	if ((((isMod || isSub || isVip) && (emoteSet.has('30259') || emoteSet.has('160400'))) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !isPaused && !welcomedUsers.has(userstate['username'])) {
+	if ((((isMod || isSub || isVip) && (emoteSet.has('30259') || emoteSet.has('160400'))) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !welcomedUsers.has(userstate['username'])) {
 		triggerLightAndNoise("hello");
 		welcomedUsers.add(userstate['username']);
 	}
 
 	// If someone uses bzbNoticeMe
-	if (emoteSet.has('emotesv2_461c6588d71e43c6b95dea6052d15701') && !isPaused && !noticedUsers.has(userstate['username'])) {
+	if (emoteSet.has('emotesv2_461c6588d71e43c6b95dea6052d15701') && !noticedUsers.has(userstate['username'])) {
 		triggerLightAndNoise("senpai");
 		noticedUsers.add(userstate['username']);
 	}
@@ -400,38 +418,36 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 
 // User has been banned
 tmiClient.on("ban", (channel, username, reason, userstate) => {
-	if (!isPaused) {
-		triggerLightAndNoise("ban");
-	}
+	triggerLightAndNoise("ban");
 });
 
 // User has been timed out
 tmiClient.on("timeout", (channel, username, reason, duration, userstate) => {
-    if (duration >= 300 && !isPaused) {
+    if (duration >= 300) {
 		triggerLightAndNoise("ban");
 	}
 });
 
 // Channel has been raided
 tmiClient.on("raided", (channel, username, viewers) => {
-	if (viewers >= 5 && !isPaused) {
+	if (viewers >= 5) {
 		triggerLightAndNoise("raid");
 	}
 });
 
 // Sub bomb triggered
 tmiClient.on("submysterygift", (channel, username, numbOfSubs, methods, userstate) => {
-    if (numbOfSubs >= 5 && !isPaused) {
+    if (numbOfSubs >= 5) {
 		triggerLightAndNoise("subbomb");
 	}
 });
 
 function redeemReward(data) {
 	if (data && data.redemption && data.redemption.reward && data.redemption.reward.title) {
-		if(data.redemption.reward.title == 'Tube Man' && !isPaused) {
+		if(data.redemption.reward.title == 'Tube Man') {
 			triggerLightAndNoise("tubeman");
 		}
-		else if(data.redemption.reward.title == 'Boogie' && !isPaused) {
+		else if(data.redemption.reward.title == 'Boogie') {
 			triggerLightAndNoise("boogie");
 		}
 	}
