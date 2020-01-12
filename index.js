@@ -96,7 +96,7 @@ wsConnect();
 
 // Connect to the Philips Hue bridge
 const hueClient = new huejay.Client({
-	host:     '192.168.1.3',
+	host:     '192.168.1.2',
 	username: 'CEnnQq8TDPSVcl8SbpptgSnD4aKAdVuooPjlElEF'
 });
 
