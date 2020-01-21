@@ -5,6 +5,9 @@ TWITCH_USER=your username
 TWITCH_OAUTH=oauth token
 TWITCH_CHANNEL=chat channel
 
+#OBS WebSocket Config
+OBS_WS_PASS=websocket password
+
 #Get new OAuth token from https://twitchapps.com/tokengen
 #Scopes: channel:read:redemptions channel_read user_read
 TWITCH_CLIENT_ID=client ID
