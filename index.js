@@ -20,6 +20,8 @@ const hueColor = {
 
 // Configure OBS websocket
 const obs = new OBSWebSocket();
+let currentScene = 'Starting Soon';
+
 obs.connect({
     address: 'localhost:4444',
     password: process.env.OBS_WS_PASS
@@ -27,6 +29,20 @@ obs.connect({
     console.log(`Connected to OBS via Websocket`);
 }).catch(err => {
     console.log('Error on OBS Websocket connect: ' + err);
+});
+
+obs.on('ConnectionOpened', () => {
+	obs.getCurrentScene().then((data) => {
+		console.log(`OBS Websocket: Setting current scene to ${data.name}`);
+		currentScene = data.name;
+	}).catch(err => {
+		console.log('OBS Websocket Error: ' + err);
+	});
+});
+  
+obs.on('SwitchScenes', data => {
+	console.log(`OBS Websocket: Setting current scene to ${data.scene-name}`);
+	currentScene = data.scene-name;
 });
 
 // Source: https://www.thepolyglotdeveloper.com/2015/03/create-a-random-nonce-string-using-javascript/
@@ -272,7 +288,8 @@ let alerts = {
 		wemoState: 0,
 		tpState: 1,
 		tpPlugs: [0, 1, 2, 3, 4, 5],
-		sound: './sounds/soundofdapolice.mp3'
+		sound: './sounds/soundofdapolice.mp3',
+		goBig: true
 	},
 	hello: {
 		timeout: 3000,
@@ -281,7 +298,8 @@ let alerts = {
 		wemoState: 1,
 		tpState: 1,
 		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello.mp3'
+		sound: './sounds/hello.mp3',
+		goBig: false
 	},
 	senpai: {
 		timeout: 6000,
@@ -290,7 +308,8 @@ let alerts = {
 		wemoState: 1,
 		tpState: 1,
 		tpPlugs: [2, 3, 4, 5],
-		sound: './sounds/noticemesenpai.mp3'
+		sound: './sounds/noticemesenpai.mp3',
+		goBig: false
 	},
 	ban: {
 		timeout: 8000,
@@ -299,7 +318,8 @@ let alerts = {
 		wemoState: 0,
 		tpState: 1,
 		tpPlugs: [0, 1],
-		sound: './sounds/soundofdapolice.mp3'
+		sound: './sounds/soundofdapolice.mp3',
+		goBig: true
 	},
 	raid: {
 		timeout: 21000,
@@ -308,7 +328,8 @@ let alerts = {
 		wemoState: 0,
 		tpState: 1,
 		tpPlugs: [0, 2],
-		sound: './sounds/redalert.mp3'
+		sound: './sounds/redalert.mp3',
+		goBig: true
 	},
 	subbomb: {
 		timeout: 26000,
@@ -317,7 +338,8 @@ let alerts = {
 		wemoState: 0,
 		tpState: 1,
 		tpPlugs: [0, 1, 2, 3, 4, 5],
-		sound: './sounds/boom.mp3'
+		sound: './sounds/boom.mp3',
+		goBig: true
 	},
 	tubeman: {
 		timeout: 7000,
@@ -326,7 +348,8 @@ let alerts = {
 		wemoState: 1,
 		tpState: 1,
 		tpPlugs: [4, 5],
-		sound: './sounds/tubeman.mp3'
+		sound: './sounds/tubeman.mp3',
+		goBig: false
 	},
 	boogie: {
 		timeout: 15000,
@@ -335,7 +358,18 @@ let alerts = {
 		wemoState: 0,
 		tpState: 1,
 		tpPlugs: [0, 1, 2, 3, 4, 5],
-		sound: './sounds/boogie.mp3'
+		sound: './sounds/boogie.mp3',
+		goBig: true
+	},
+	silence: {
+		timeout: 31000,
+		strobe1: null,
+		strobe2: null,
+		wemoState: null,
+		tpState: null,
+		tpPlugs: null,
+		sound: './sounds/countdown.mp3',
+		goBig: false
 	}
 }
 
@@ -349,7 +383,18 @@ function triggerLightAndNoise(type) {
 	} else if (type) {
 		isExecuting = true;
 		let alert = alerts[type];
-		changePowerSwitches(alert.wemoState, alert.tpState, alert.tpPlugs, alert.timeout);
+
+		if (alert.goBig && currentScene.startsWith('Shop') && currentScene != 'Shop - Starting Soon') {
+			obs.setCurrentScene({'scene-name' : 'Shop - Big Cam'}).then(() => {
+				console.log('OBS Websocket: Changing scene to Shop - Big Cam');
+            }).catch(err => {
+				console.log('OBS Websocket Error: ' + err);
+            });
+		}
+
+		if (wemoState != null && tpState != null && tpPlugs != null) {
+			changePowerSwitches(alert.wemoState, alert.tpState, alert.tpPlugs, alert.timeout);
+		}
 		
 		if (alert.strobe1 && alert.strobe2) {
 			alternateStrobing(3, 8, alert.strobe1, alert.strobe2, alert.timeout);
@@ -408,6 +453,25 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 		triggerLightAndNoise("demo");
 	}
 
+	// TEST ONLY
+	if (isMod && message.startsWith("!silence")) {
+		console.log('SILENCE TEST');
+		triggerLightAndNoise('silence');
+		
+		obs.setMute({'source' : 'Mic/Aux', 'mute': true}).then(() => {
+			console.log('OBS Websocket: Mic muted');
+			setTimeout(function() {
+				obs.setMute({'source' : 'Mic/Aux', 'mute': false}).then(() => {
+					console.log('OBS Websocket: Mic unmuted');
+				}).catch(err => {
+					console.log('OBS Websocket Error: ' + err);
+				});
+			}, 30000);
+		}).catch(err => {
+			console.log('OBS Websocket Error: ' + err);
+		});
+	}
+
 	// Allow mods to trigger any sound/light combo
 	if (isMod && message.startsWith("!trigger")) {
 		let words = message.split(' ');
@@ -451,17 +515,47 @@ tmiClient.on("raided", (channel, username, viewers) => {
 // Sub bomb triggered
 tmiClient.on("submysterygift", (channel, username, numbOfSubs, methods, userstate) => {
     if (numbOfSubs >= 5) {
-		triggerLightAndNoise("subbomb");
+		triggerLightAndNoise('subbomb');
 	}
 });
 
 function redeemReward(data) {
 	if (data && data.redemption && data.redemption.reward && data.redemption.reward.title) {
 		if(data.redemption.reward.title == 'Tube Man') {
-			triggerLightAndNoise("tubeman");
+			triggerLightAndNoise('tubeman');
 		}
 		else if(data.redemption.reward.title == 'Boogie') {
-			triggerLightAndNoise("boogie");
+			triggerLightAndNoise('boogie');
+		}
+		else if(data.redemption.reward.title == 'Choose Any' && data.redemption.user_input) {
+			let userInputWords = data.redemption.user_input.toLowerCase().split(' ');
+			let triggerFound = false;
+			for (let word of userInputWords) {
+				if (alerts[word]) {
+					triggerLightAndNoise(word);
+					triggerFound = true;
+					break;
+				}
+			}
+			if (!triggerFound) {
+				tmiClient.say(process.env.TWITCH_CHANNEL, "The Choose Any reward was redeemed, but no trigger word was found.");
+			}
+		}
+		else if(data.redemption.reward.title == 'Silence') {
+			triggerLightAndNoise('silence');
+			
+            obs.setMute({'source' : 'Mic/Aux', 'mute': true}).then(() => {
+				console.log('OBS Websocket: Mic muted');
+				setTimeout(function() {
+					obs.setMute({'source' : 'Mic/Aux', 'mute': false}).then(() => {
+						console.log('OBS Websocket: Mic unmuted');
+					}).catch(err => {
+						console.log('OBS Websocket Error: ' + err);
+					});
+				}, 30000);
+            }).catch(err => {
+				console.log('OBS Websocket Error: ' + err);
+            });
 		}
 	}
 }
