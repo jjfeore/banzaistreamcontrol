@@ -32,7 +32,7 @@ obs.connect({
 });
 
 obs.on('ConnectionOpened', () => {
-	obs.getCurrentScene().then((data) => {
+	obs.send('GetCurrentScene').then((data) => {
 		console.log(`OBS Websocket: Setting current scene to ${data.name}`);
 		currentScene = data.name;
 	}).catch(err => {
@@ -385,7 +385,7 @@ function triggerLightAndNoise(type) {
 		let alert = alerts[type];
 
 		if (alert.goBig && currentScene.startsWith('Shop') && currentScene != 'Shop - Starting Soon') {
-			obs.setCurrentScene({'scene-name' : 'Shop - Big Cam'}).then(() => {
+			obs.send('SetCurrentScene', {'scene-name' : 'Shop - Big Cam'}).then(() => {
 				console.log('OBS Websocket: Changing scene to Shop - Big Cam');
             }).catch(err => {
 				console.log('OBS Websocket Error: ' + err);
@@ -458,10 +458,10 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 		console.log('SILENCE TEST');
 		triggerLightAndNoise('silence');
 		
-		obs.setMute({'source' : 'Mic/Aux', 'mute': true}).then(() => {
+		obs.send('SetMute', {'source' : 'Mic/Aux', 'mute': true}).then(() => {
 			console.log('OBS Websocket: Mic muted');
 			setTimeout(function() {
-				obs.setMute({'source' : 'Mic/Aux', 'mute': false}).then(() => {
+				obs.send('SetMute', {'source' : 'Mic/Aux', 'mute': false}).then(() => {
 					console.log('OBS Websocket: Mic unmuted');
 				}).catch(err => {
 					console.log('OBS Websocket Error: ' + err);
@@ -544,10 +544,10 @@ function redeemReward(data) {
 		else if(data.redemption.reward.title == 'Silence') {
 			triggerLightAndNoise('silence');
 			
-            obs.setMute({'source' : 'Mic/Aux', 'mute': true}).then(() => {
+            obs.send('SetMute', {'source' : 'Mic/Aux', 'mute': true}).then(() => {
 				console.log('OBS Websocket: Mic muted');
 				setTimeout(function() {
-					obs.setMute({'source' : 'Mic/Aux', 'mute': false}).then(() => {
+					obs.send('SetMute', {'source' : 'Mic/Aux', 'mute': false}).then(() => {
 						console.log('OBS Websocket: Mic unmuted');
 					}).catch(err => {
 						console.log('OBS Websocket Error: ' + err);
