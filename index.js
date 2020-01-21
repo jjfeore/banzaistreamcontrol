@@ -41,8 +41,8 @@ obs.on('ConnectionOpened', () => {
 });
   
 obs.on('SwitchScenes', data => {
-	console.log(`OBS Websocket: Setting current scene to ${data.scene-name}`);
-	currentScene = data.scene-name;
+	console.log(`OBS Websocket: Setting current scene to ${data['scene-name']}`);
+	currentScene = data['scene-name'];
 });
 
 // Source: https://www.thepolyglotdeveloper.com/2015/03/create-a-random-nonce-string-using-javascript/
@@ -392,7 +392,7 @@ function triggerLightAndNoise(type) {
             });
 		}
 
-		if (wemoState != null && tpState != null && tpPlugs != null) {
+		if (alert.wemoState != null && alert.tpState != null && alert.tpPlugs != null) {
 			changePowerSwitches(alert.wemoState, alert.tpState, alert.tpPlugs, alert.timeout);
 		}
 		
@@ -451,25 +451,6 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 	// Allow mods to trigger a demo
 	if (isMod && message.startsWith("!demo")) {
 		triggerLightAndNoise("demo");
-	}
-
-	// TEST ONLY
-	if (isMod && message.startsWith("!silence")) {
-		console.log('SILENCE TEST');
-		triggerLightAndNoise('silence');
-		
-		obs.send('SetMute', {'source' : 'Mic/Aux', 'mute': true}).then(() => {
-			console.log('OBS Websocket: Mic muted');
-			setTimeout(function() {
-				obs.send('SetMute', {'source' : 'Mic/Aux', 'mute': false}).then(() => {
-					console.log('OBS Websocket: Mic unmuted');
-				}).catch(err => {
-					console.log('OBS Websocket Error: ' + err);
-				});
-			}, 30000);
-		}).catch(err => {
-			console.log('OBS Websocket Error: ' + err);
-		});
 	}
 
 	// Allow mods to trigger any sound/light combo
