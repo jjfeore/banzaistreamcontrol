@@ -522,7 +522,7 @@ function redeemReward(data) {
 				tmiClient.say(process.env.TWITCH_CHANNEL, "The Choose Any reward was redeemed, but no trigger word was found.");
 			}
 		}
-		else if(data.redemption.reward.title == 'Silence') {
+		else if(data.redemption.reward.title == 'SILENCE') {
 			triggerLightAndNoise('silence');
 			
             obs.send('SetMute', {'source' : 'Mic/Aux', 'mute': true}).then(() => {
