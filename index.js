@@ -301,6 +301,276 @@ let alerts = {
 		sound: './sounds/hello.mp3',
 		goBig: false
 	},
+	helloabbyfabby: {
+		timeout: 11000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-abbyfabby.mp3',
+		goBig: false
+	},
+	helloantivigames: {
+		timeout: 6000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-antivigames.mp3',
+		goBig: false
+	},
+	hellobjwhite211: {
+		timeout: 9000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-bjwhite211.mp3',
+		goBig: false
+	},
+	hellobrandanf: {
+		timeout: 10000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-brandan-f.mp3',
+		goBig: false
+	},
+	hellobungalowglow: {
+		timeout: 12000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-bungalowglow.mp3',
+		goBig: false
+	},
+	hellocasinoduckling: {
+		timeout: 8000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-casinoduckling.mp3',
+		goBig: false
+	},
+	hellodanhalen: {
+		timeout: 9000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-danhalen-us.mp3',
+		goBig: false
+	},
+	hellodragonflythru1: {
+		timeout: 11000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-dragonflythru-1.mp3',
+		goBig: false
+	},
+	hellohiccupingboots: {
+		timeout: 9000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-hiccupingboots.mp3',
+		goBig: false
+	},
+	helloinstafluff: {
+		timeout: 10000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-instafluff.mp3',
+		goBig: false
+	},
+	helloitmeharu: {
+		timeout: 11000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-itmeharu.mp3',
+		goBig: false
+	},
+	helloitsayu: {
+		timeout: 12000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-its-ayu.mp3',
+		goBig: false
+	},
+	hellojellydance: {
+		timeout: 6000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-jellydance.mp3',
+		goBig: false
+	},
+	hellojulieee22: {
+		timeout: 11000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-julieee22.mp3',
+		goBig: false
+	},
+	hellolenabotse: {
+		timeout: 10000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-lenabotse.mp3',
+		goBig: false
+	},
+	hellomacabreman: {
+		timeout: 7000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-macabreman.mp3',
+		goBig: false
+	},
+	hellomalfunct: {
+		timeout: 7000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-malfunct.mp3',
+		goBig: false
+	},
+	hellomoddedorange23: {
+		timeout: 11000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-moddedorange23.mp3',
+		goBig: false
+	},
+	hellomoriarty24: {
+		timeout: 14000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-moriarty24.mp3',
+		goBig: false
+	},
+	hellonitecrawla: {
+		timeout: 9000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-nitecrawla.mp3',
+		goBig: false
+	},
+	helloroyoushi: {
+		timeout: 8000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-royoushi.mp3',
+		goBig: false
+	},
+	hellosourbeers: {
+		timeout: 15000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-sourbeers.mp3',
+		goBig: false
+	},
+	hellosparkypugwash: {
+		timeout: 10000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-sparky-pugwash.mp3',
+		goBig: false
+	},
+	helloswolemaz: {
+		timeout: 10000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-swolemaz.mp3',
+		goBig: false
+	},
+	hellothatmsgamer: {
+		timeout: 12000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-that-ms-gamer.mp3',
+		goBig: false
+	},
+	hellotrueblue7742: {
+		timeout: 12000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-trueblue77-42.mp3',
+		goBig: false
+	},
+	helloyoadriennexd: {
+		timeout: 17000,
+		strobe1: hueColor.deeppurple,
+		strobe2: hueColor.orange,
+		wemoState: 1,
+		tpState: 1,
+		tpPlugs: [2, 3, 4],
+		sound: './sounds/hello-yoadriennexd.mp3',
+		goBig: false
+	},
 	senpai: {
 		timeout: 6000,
 		strobe1: hueColor.deeppurple,
@@ -332,7 +602,7 @@ let alerts = {
 		goBig: true
 	},
 	subbomb: {
-		timeout: 26000,
+		timeout: 21000,
 		strobe1: hueColor.deeppurple,
 		strobe2: hueColor.orange,
 		wemoState: 0,
@@ -352,7 +622,7 @@ let alerts = {
 		goBig: false
 	},
 	boogie: {
-		timeout: 15000,
+		timeout: 16000,
 		strobe1: hueColor.deeppurple,
 		strobe2: hueColor.orange,
 		wemoState: 0,
@@ -463,7 +733,90 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 
 	// If a Mod/Sub/VIP says HeyGuys for the first time that day or anyone uses bzbHey
 	if ((((isMod || isSub || isVip) && (emoteSet.has('30259') || emoteSet.has('160400'))) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !welcomedUsers.has(userstate['username'])) {
-		triggerLightAndNoise("hello");
+		if (userstate['username'] == 'abbyfabby') {
+			triggerLightAndNoise("helloabbyfabby");
+		}
+		else if (userstate['username'] == 'antivigames') {
+			triggerLightAndNoise("helloantivigames");
+		}
+		else if (userstate['username'] == 'bjwhite211') {
+			triggerLightAndNoise("hellobjwhite211");
+		}
+		else if (userstate['username'] == 'brandanf_') {
+			triggerLightAndNoise("hellobrandanf");
+		}
+		else if (userstate['username'] == 'bungalowglow') {
+			triggerLightAndNoise("hellobungalowglow");
+		}
+		else if (userstate['username'] == 'casinoduckling') {
+			triggerLightAndNoise("hellocasinoduckling");
+		}
+		else if (userstate['username'] == 'danhalen') {
+			triggerLightAndNoise("hellodanhalen");
+		}
+		else if (userstate['username'] == 'dragonflythru_1') {
+			triggerLightAndNoise("hellodragonflythru1");
+		}
+		else if (userstate['username'] == 'hiccupingboots') {
+			triggerLightAndNoise("hellohiccupingboots");
+		}
+		else if (userstate['username'] == 'instafluff') {
+			triggerLightAndNoise("helloinstafluff");
+		}
+		else if (userstate['username'] == 'itmeharu') {
+			triggerLightAndNoise("helloitmeharu");
+		}
+		else if (userstate['username'] == 'itsayu') {
+			triggerLightAndNoise("helloitsayu");
+		}
+		else if (userstate['username'] == 'jellydance') {
+			triggerLightAndNoise("hellojellydance");
+		}
+		else if (userstate['username'] == 'julieee22') {
+			triggerLightAndNoise("hellojulieee22");
+		}
+		else if (userstate['username'] == 'lenabotse') {
+			triggerLightAndNoise("hellolenabotse");
+		}
+		else if (userstate['username'] == 'macabreman') {
+			triggerLightAndNoise("hellomacabreman");
+		}
+		else if (userstate['username'] == 'malfunct') {
+			triggerLightAndNoise("hellomalfunct");
+		}
+		else if (userstate['username'] == 'moddedorange23') {
+			triggerLightAndNoise("hellomoddedorange23");
+		}
+		else if (userstate['username'] == 'moriarty24') {
+			triggerLightAndNoise("hellomoriarty24");
+		}
+		else if (userstate['username'] == 'nitecrawla') {
+			triggerLightAndNoise("hellonitecrawla");
+		}
+		else if (userstate['username'] == 'royoushi') {
+			triggerLightAndNoise("helloroyoushi");
+		}
+		else if (userstate['username'] == 'sourbeers') {
+			triggerLightAndNoise("hellosourbeers");
+		}
+		else if (userstate['username'] == 'sparky_pugwash') {
+			triggerLightAndNoise("hellosparkypugwash");
+		}
+		else if (userstate['username'] == 'swolemaz') {
+			triggerLightAndNoise("helloswolemaz");
+		}
+		else if (userstate['username'] == 'that_ms_gamer') {
+			triggerLightAndNoise("hellothatmsgamer");
+		}
+		else if (userstate['username'] == 'trueblue77_42') {
+			triggerLightAndNoise("hellotrueblue7742");
+		}
+		else if (userstate['username'] == 'yoadriennexd') {
+			triggerLightAndNoise("helloyoadriennexd");
+		}
+		else {
+			triggerLightAndNoise("hello");
+		}
 		welcomedUsers.add(userstate['username']);
 	}
 
