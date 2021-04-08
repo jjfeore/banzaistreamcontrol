@@ -6,6 +6,7 @@ const tplink = require('tplink-smarthome-api');
 const wemo = require('wemo-client');
 const WebSocket = require('ws');
 const OBSWebSocket = require('obs-websocket-js');
+const NodeMediaServer = require('node-media-server');
 
 dotenv.config();
 
@@ -17,6 +18,64 @@ const hueColor = {
 	green: 25500,
 	orange: 9992
 };
+
+const vipUsers = {
+	abbyfabby: ['./sounds/hello-abbyfabby.mp3', 11000],
+	antivigames: ['./sounds/hello-antivigames.mp3', 6000],
+	bjwhite211: ['./sounds/hello-bjwhite211.mp3', 9000],
+	brandan_f: ['./sounds/hello-brandan-f.mp3', 10000],
+	bungalowglow: ['./sounds/hello-bungalowglow.mp3', 12000],
+	casinoduck: ['./sounds/hello-casinoduckling.mp3', 8000],
+	danhalen_: ['./sounds/hello-danhalen-us.mp3', 9000],
+	dragonflytru_1: ['./sounds/hello-dragonflythru-1.mp3', 11000],
+	hiccupingboots: ['./sounds/hello-hiccupingboots.mp3', 9000],
+	instafluff: ['./sounds/hello-instafluff.mp3', 10000],
+	itmeharu: ['./sounds/hello-itmeharu.mp3', 11000],
+	itsayu: ['./sounds/hello-its-ayu.mp3', 12000],
+	jellydance: ['./sounds/hello-jellydance.mp3', 6000],
+	julieee22: ['./sounds/hello-julieee22.mp3', 11000],
+	lenabotse: ['./sounds/hello-lenabotse.mp3', 10000],
+	macabreman: ['./sounds/hello-macabreman.mp3', 7000],
+	malfunct: ['./sounds/hello-malfunct.mp3', 7000],
+	moddedorange23: ['./sounds/hello-moddedorange23.mp3', 11000],
+	moriarty24: ['./sounds/hello-moriarty24.mp3', 14000],
+	nitecrawla: ['./sounds/hello-nitecrawla.mp3', 9000],
+	royoushi: ['./sounds/hello-royoushi.mp3', 8000],
+	sourbeers: ['./sounds/hello-sourbeers.mp3', 15000],
+	sparky_pugwash: ['./sounds/hello-sparky-pugwash.mp3', 10000],
+	swolemaz: ['./sounds/hello-swolemaz.mp3', 10000],
+	that_ms_gamer: ['./sounds/hello-that-ms-gamer.mp3', 12000],
+	trueblue77_42: ['./sounds/hello-trueblue77-42.mp3', 12000],
+	yoadriennexd: ['./sounds/hello-yoadriennexd.mp3', 17000]
+}
+
+// Configure and initialize the RTMP server
+const nmsConfig = {
+	rtmp: {
+	  port: 1935,
+	  chunk_size: 60000,
+	  gop_cache: true,
+	  ping: 60,
+	  ping_timeout: 30
+	},
+	http: {
+	  port: 8000,
+	  allow_origin: '*'
+	}
+  };
+   
+  let nms = new NodeMediaServer(nmsConfig);
+  nms.run();
+
+// On RTMP connection to server
+nms.on('postConnect', (id, args) => {
+    console.log('[NodeEvent on postConnect]', `id=${id} args=${JSON.stringify(args)}`);
+});
+
+// On RTMP disconnect from server
+nms.on('doneConnect', (id, args) => {
+    console.log('[NodeEvent on doneConnect]', `id=${id} args=${JSON.stringify(args)}`);
+});
 
 // Configure OBS websocket
 const obs = new OBSWebSocket();
@@ -301,274 +360,12 @@ let alerts = {
 		sound: './sounds/hello.mp3',
 		goBig: false
 	},
-	helloabbyfabby: {
-		timeout: 11000,
+	hellovip: {
 		strobe1: hueColor.deeppurple,
 		strobe2: hueColor.orange,
 		wemoState: 1,
 		tpState: 1,
 		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-abbyfabby.mp3',
-		goBig: false
-	},
-	helloantivigames: {
-		timeout: 6000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-antivigames.mp3',
-		goBig: false
-	},
-	hellobjwhite211: {
-		timeout: 9000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-bjwhite211.mp3',
-		goBig: false
-	},
-	hellobrandanf: {
-		timeout: 10000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-brandan-f.mp3',
-		goBig: false
-	},
-	hellobungalowglow: {
-		timeout: 12000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-bungalowglow.mp3',
-		goBig: false
-	},
-	hellocasinoduckling: {
-		timeout: 8000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-casinoduckling.mp3',
-		goBig: false
-	},
-	hellodanhalen: {
-		timeout: 9000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-danhalen-us.mp3',
-		goBig: false
-	},
-	hellodragonflythru1: {
-		timeout: 11000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-dragonflythru-1.mp3',
-		goBig: false
-	},
-	hellohiccupingboots: {
-		timeout: 9000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-hiccupingboots.mp3',
-		goBig: false
-	},
-	helloinstafluff: {
-		timeout: 10000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-instafluff.mp3',
-		goBig: false
-	},
-	helloitmeharu: {
-		timeout: 11000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-itmeharu.mp3',
-		goBig: false
-	},
-	helloitsayu: {
-		timeout: 12000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-its-ayu.mp3',
-		goBig: false
-	},
-	hellojellydance: {
-		timeout: 6000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-jellydance.mp3',
-		goBig: false
-	},
-	hellojulieee22: {
-		timeout: 11000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-julieee22.mp3',
-		goBig: false
-	},
-	hellolenabotse: {
-		timeout: 10000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-lenabotse.mp3',
-		goBig: false
-	},
-	hellomacabreman: {
-		timeout: 7000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-macabreman.mp3',
-		goBig: false
-	},
-	hellomalfunct: {
-		timeout: 7000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-malfunct.mp3',
-		goBig: false
-	},
-	hellomoddedorange23: {
-		timeout: 11000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-moddedorange23.mp3',
-		goBig: false
-	},
-	hellomoriarty24: {
-		timeout: 14000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-moriarty24.mp3',
-		goBig: false
-	},
-	hellonitecrawla: {
-		timeout: 9000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-nitecrawla.mp3',
-		goBig: false
-	},
-	helloroyoushi: {
-		timeout: 8000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-royoushi.mp3',
-		goBig: false
-	},
-	hellosourbeers: {
-		timeout: 15000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-sourbeers.mp3',
-		goBig: false
-	},
-	hellosparkypugwash: {
-		timeout: 10000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-sparky-pugwash.mp3',
-		goBig: false
-	},
-	helloswolemaz: {
-		timeout: 10000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-swolemaz.mp3',
-		goBig: false
-	},
-	hellothatmsgamer: {
-		timeout: 12000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-that-ms-gamer.mp3',
-		goBig: false
-	},
-	hellotrueblue7742: {
-		timeout: 12000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-trueblue77-42.mp3',
-		goBig: false
-	},
-	helloyoadriennexd: {
-		timeout: 17000,
-		strobe1: hueColor.deeppurple,
-		strobe2: hueColor.orange,
-		wemoState: 1,
-		tpState: 1,
-		tpPlugs: [2, 3, 4],
-		sound: './sounds/hello-yoadriennexd.mp3',
 		goBig: false
 	},
 	senpai: {
@@ -651,8 +448,21 @@ function triggerLightAndNoise(type) {
 	if (isPaused || isExecuting) {
 		eventQueue.push(type);
 	} else if (type) {
+		let alert;
+
+		if (!alerts.hasOwnProperty(type) && !vipUsers.hasOwnProperty(type)) {
+			return;
+		}
+		else if (vipUsers.hasOwnProperty(type)) {
+			alert = alerts['hellovip'];
+			alert.timeout = vipUsers[type][1];
+			alert.sound = vipUsers[type][0];
+		}
+		else {
+			alert = alerts[type];
+		}
+
 		isExecuting = true;
-		let alert = alerts[type];
 
 		if (alert.goBig && currentScene.startsWith('Shop') && currentScene != 'Shop - Starting Soon') {
 			obs.send('SetCurrentScene', {'scene-name' : 'Shop - Big Cam'}).then(() => {
@@ -733,86 +543,8 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 
 	// If a Mod/Sub/VIP says HeyGuys for the first time that day or anyone uses bzbHey
 	if ((((isMod || isSub || isVip) && (emoteSet.has('30259') || emoteSet.has('160400'))) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !welcomedUsers.has(userstate['username'])) {
-		if (userstate['username'] == 'abbyfabby') {
-			triggerLightAndNoise("helloabbyfabby");
-		}
-		else if (userstate['username'] == 'antivigames') {
-			triggerLightAndNoise("helloantivigames");
-		}
-		else if (userstate['username'] == 'bjwhite211') {
-			triggerLightAndNoise("hellobjwhite211");
-		}
-		else if (userstate['username'] == 'brandanf_') {
-			triggerLightAndNoise("hellobrandanf");
-		}
-		else if (userstate['username'] == 'bungalowglow') {
-			triggerLightAndNoise("hellobungalowglow");
-		}
-		else if (userstate['username'] == 'casinoduckling') {
-			triggerLightAndNoise("hellocasinoduckling");
-		}
-		else if (userstate['username'] == 'danhalen') {
-			triggerLightAndNoise("hellodanhalen");
-		}
-		else if (userstate['username'] == 'dragonflythru_1') {
-			triggerLightAndNoise("hellodragonflythru1");
-		}
-		else if (userstate['username'] == 'hiccupingboots') {
-			triggerLightAndNoise("hellohiccupingboots");
-		}
-		else if (userstate['username'] == 'instafluff') {
-			triggerLightAndNoise("helloinstafluff");
-		}
-		else if (userstate['username'] == 'itmeharu') {
-			triggerLightAndNoise("helloitmeharu");
-		}
-		else if (userstate['username'] == 'itsayu') {
-			triggerLightAndNoise("helloitsayu");
-		}
-		else if (userstate['username'] == 'jellydance') {
-			triggerLightAndNoise("hellojellydance");
-		}
-		else if (userstate['username'] == 'julieee22') {
-			triggerLightAndNoise("hellojulieee22");
-		}
-		else if (userstate['username'] == 'lenabotse') {
-			triggerLightAndNoise("hellolenabotse");
-		}
-		else if (userstate['username'] == 'macabreman') {
-			triggerLightAndNoise("hellomacabreman");
-		}
-		else if (userstate['username'] == 'malfunct') {
-			triggerLightAndNoise("hellomalfunct");
-		}
-		else if (userstate['username'] == 'moddedorange23') {
-			triggerLightAndNoise("hellomoddedorange23");
-		}
-		else if (userstate['username'] == 'moriarty24') {
-			triggerLightAndNoise("hellomoriarty24");
-		}
-		else if (userstate['username'] == 'nitecrawla') {
-			triggerLightAndNoise("hellonitecrawla");
-		}
-		else if (userstate['username'] == 'royoushi') {
-			triggerLightAndNoise("helloroyoushi");
-		}
-		else if (userstate['username'] == 'sourbeers') {
-			triggerLightAndNoise("hellosourbeers");
-		}
-		else if (userstate['username'] == 'sparky_pugwash') {
-			triggerLightAndNoise("hellosparkypugwash");
-		}
-		else if (userstate['username'] == 'swolemaz') {
-			triggerLightAndNoise("helloswolemaz");
-		}
-		else if (userstate['username'] == 'that_ms_gamer') {
-			triggerLightAndNoise("hellothatmsgamer");
-		}
-		else if (userstate['username'] == 'trueblue77_42') {
-			triggerLightAndNoise("hellotrueblue7742");
-		}
-		else if (userstate['username'] == 'yoadriennexd') {
-			triggerLightAndNoise("helloyoadriennexd");
+		if (vipUsers.hasOwnProperty(userstate['username'])) {
+			triggerLightAndNoise(userstate['username']);
 		}
 		else {
 			triggerLightAndNoise("hello");
