@@ -507,7 +507,6 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 	let emoteSet = new Set(emotes);
 
 	message = message.toLowerCase();
-	// console.log(`User is ${userstate['username']} with type ${userstate['user-type']} and emotes is ${emotes}`);
 
 	// Allow mods to toggle safemode on or off
 	if (isMod && message.startsWith("!safemode")) {
@@ -527,22 +526,19 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 			triggerLightAndNoise(eventQueue.shift());
 		}
 	}
-
 	// Allow mods to trigger a demo
-	if (isMod && message.startsWith("!demo")) {
+	else if (isMod && message.startsWith("!demo")) {
 		triggerLightAndNoise("demo");
 	}
-
 	// Allow mods to trigger any sound/light combo
-	if (isMod && message.startsWith("!trigger")) {
+	else if (isMod && message.startsWith("!trigger")) {
 		let words = message.split(' ');
 		if (words[1] in alerts) {
 			triggerLightAndNoise(words[1]);
 		}
 	}
-
 	// If a Mod/Sub/VIP says HeyGuys for the first time that day or anyone uses bzbHey
-	if ((((isMod || isSub || isVip) && (emoteSet.has('30259') || emoteSet.has('160400'))) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !welcomedUsers.has(userstate['username'])) {
+	else if ((((isMod || isSub || isVip) && (emoteSet.has('30259') || emoteSet.has('160400'))) || emoteSet.has('emotesv2_ec3052867f44421896453a73728dfdb6')) && !welcomedUsers.has(userstate['username'])) {
 		if (vipUsers.hasOwnProperty(userstate['username'])) {
 			triggerLightAndNoise(userstate['username']);
 		}
@@ -551,9 +547,8 @@ tmiClient.on("chat", (channel, userstate, message, self) => {
 		}
 		welcomedUsers.add(userstate['username']);
 	}
-
 	// If someone uses bzbNoticeMe
-	if (emoteSet.has('emotesv2_461c6588d71e43c6b95dea6052d15701') && !noticedUsers.has(userstate['username'])) {
+	else if (emoteSet.has('emotesv2_461c6588d71e43c6b95dea6052d15701') && !noticedUsers.has(userstate['username'])) {
 		triggerLightAndNoise("senpai");
 		noticedUsers.add(userstate['username']);
 	}
