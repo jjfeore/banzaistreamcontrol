@@ -23,7 +23,7 @@
     "node-media-server": "^2.2.4",
     "obs-websocket-js": "^4.0.0",
     "play-sound": "^1.1.6",
-    "tmi.js": "^1.5.0",
+    "tmi.js": "^1.8.5",
     "tplink-smarthome-api": "^1.2.0",
     "wemo-client": "^0.15.0",
     "ws": "^7.4.6"
