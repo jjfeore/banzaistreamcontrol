@@ -26,6 +26,6 @@
     "tmi.js": "^1.5.0",
     "tplink-smarthome-api": "^1.2.0",
     "wemo-client": "^0.15.0",
-    "ws": "^7.2.1"
+    "ws": "^7.4.6"
   }
 }
